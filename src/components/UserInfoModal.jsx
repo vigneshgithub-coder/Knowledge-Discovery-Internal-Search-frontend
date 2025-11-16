@@ -34,7 +34,8 @@ const UserInfoModal = () => {
 
     try {
       // Send to backend
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/users/register`, {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:5000';
+      const response = await fetch(`${baseUrl}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

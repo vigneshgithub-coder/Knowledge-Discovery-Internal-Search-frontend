@@ -2,7 +2,7 @@ import axios from 'axios';
 // @ts-ignore
 import { userStorage } from '../utils/userStorage';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:5000/api').replace(/\/$/, '');
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -40,7 +40,7 @@ export const uploadDocument = async (file: File, projectName: string, tags: stri
     formData.append('team', options.team);
   }
 
-  const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
+  const response = await apiClient.post('/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 
