@@ -96,8 +96,11 @@ export function SearchPage() {
         userId
       });
       
+      console.log('Search results received:', searchResults);
+      console.log('Results array:', searchResults.results);
+      
       setResults(searchResults.results || []);
-      setTotalResults(searchResults.total || searchResults.length || 0);
+      setTotalResults(searchResults.count || searchResults.results?.length || 0);
       setCurrentPage(page);
     } catch (error) {
       console.error('Search failed:', error);

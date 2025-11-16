@@ -69,7 +69,7 @@ export const searchDocuments = async (query: string, projectName?: string) => {
   }
 
   const response = await apiClient.post('/search', requestBody);
-  return response.data.results; // Extract results array from response
+  return response.data; // Return the full response which contains { success, results, count }
 };
 
 export const getDocuments = async (projectName?: string, userId?: string) => {
