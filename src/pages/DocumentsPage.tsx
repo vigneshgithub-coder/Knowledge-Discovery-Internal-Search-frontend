@@ -5,6 +5,8 @@ import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 import { useToast } from '../components/Toast';
 import { formatDate, formatFileSize, truncateText } from '../utils/formatters';
+import UserInfoModal from '../components/UserInfoModal';
+import { userInfoExists } from '../utils/userInfo';
 
 interface Document {
   id: string;
@@ -24,11 +26,19 @@ export function DocumentsPage() {
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
   const { addToast } = useToast();
 
   useEffect(() => {
     loadProjects();
     loadDocuments();
+  }, []);
+
+  useEffect(() => {
+    // Check if user info is present, show modal if not
+    if (!userInfoExists()) {
+      setShowUserInfoModal(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -77,6 +87,11 @@ export function DocumentsPage() {
     setSelectedDoc(doc);
     setIsModalOpen(true);
   };
+
+  // Block UI until user info is provided
+  if (!userInfoExists()) {
+    return <UserInfoModal />;
+  }
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -238,6 +253,13 @@ export function DocumentsPage() {
           </div>
         )}
       </Modal>
+
+      {showUserInfoModal && (
+        <UserInfoModal
+          onClose={() => setShowUserInfoModal(false)}
+          onSubmit={() => setShowUserInfoModal(false)}
+        />
+      )}
     </div>
   );
 }

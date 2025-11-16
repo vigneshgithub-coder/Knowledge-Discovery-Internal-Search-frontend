@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Upload, Search, FileText } from 'lucide-react';
+import { Upload, Search, FileText, BarChart3 } from 'lucide-react';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -11,6 +11,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { path: '/upload', label: 'Upload', icon: Upload },
     { path: '/search', label: 'Search', icon: Search },
     { path: '/documents', label: 'Documents', icon: FileText },
+    { path: '/admin', label: 'Admin', icon: BarChart3 },
   ];
 
   return (

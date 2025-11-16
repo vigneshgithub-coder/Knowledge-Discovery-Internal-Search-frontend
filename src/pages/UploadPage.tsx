@@ -6,6 +6,8 @@ import { Input } from '../components/Input';
 import { useToast } from '../components/Toast';
 import { validateProjectName, validateTags } from '../utils/validation';
 import { formatFileSize } from '../utils/formatters';
+import UserInfoModal from '../components/UserInfoModal';
+import { userInfoExists } from '../utils/userInfo';
 
 export function UploadPage() {
   const [projectName, setProjectName] = useState('');
@@ -93,6 +95,11 @@ export function UploadPage() {
       setIsLoading(false);
     }
   };
+
+  // Block UI until user info is provided
+  if (!userInfoExists()) {
+    return <UserInfoModal />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto">

@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { UploadPage } from './pages/UploadPage';
 import { SearchPage } from './pages/SearchPage';
 import { DocumentsPage } from './pages/DocumentsPage';
+import { AdminPage } from './pages/AdminPage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/" element={<Navigate to="/search" replace />} />
           </Routes>
         </Layout>

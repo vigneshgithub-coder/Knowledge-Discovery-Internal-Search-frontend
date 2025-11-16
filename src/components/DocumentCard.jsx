@@ -1,0 +1,234 @@
+import React, { useState } from 'react';
+import { Calendar, User, FileText, Download, Eye, Tag, Folder, ChevronDown, Trash2 } from 'lucide-react';
+import { formatDate } from '../utils/formatters';
+
+const DocumentCard = ({ 
+  document, 
+  onPreview, 
+  onDownload, 
+  onView, 
+  onDelete, 
+  highlightText = '' 
+}) => {
+  const [showActions, setShowActions] = useState(false);
+  
+  const getFileTypeIcon = (fileType) => {
+    const iconClass = "w-5 h-5";
+    switch (fileType?.toLowerCase()) {
+      case 'pdf':
+        return <span className={`${iconClass} text-red-500`}>📄</span>;
+      case 'docx':
+        return <span className={`${iconClass} text-blue-500`}>📝</span>;
+      case 'pptx':
+        return <span className={`${iconClass} text-orange-500`}>📊</span>;
+      case 'txt':
+        return <span className={`${iconClass} text-gray-500`}>📃</span>;
+      default:
+        return <FileText className={`${iconClass} text-gray-400`} />;
+    }
+  };
+
+  const getFileTypeColor = (fileType) => {
+    switch (fileType?.toLowerCase()) {
+      case 'pdf':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'docx':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'pptx':
+        return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'txt':
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const highlightTextInContent = (text, highlight) => {
+    if (!highlight || !text) return text;
+    
+    const regex = new RegExp(`(${highlight})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? <mark key={index} className="bg-yellow-200 px-1 rounded">{part}</mark> : part
+    );
+  };
+
+  const truncateText = (text, maxLength = 200) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
+  return (
+    <div className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div className="p-6 pb-4">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3">
+            {getFileTypeIcon(document.fileType)}
+            <div>
+              <h3 className="font-semibold text-gray-900 text-lg group-hover:text-blue-600 transition-colors line-clamp-2">
+                {document.fileName}
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getFileTypeColor(document.fileType)}`}>
+                  {document.fileType?.toUpperCase()}
+                </span>
+                {document.category && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
+                    <Tag className="w-3 h-3 mr-1" />
+                    {document.category}
+                  </span>
+                )}
+                {document.autoCategory && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                    {document.autoCategory}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <button
+              onClick={() => setShowActions(!showActions)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            </button>
+            
+            {showActions && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                {onPreview && (
+                  <button
+                    onClick={() => {
+                      onPreview(document);
+                      setShowActions(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Preview
+                  </button>
+                )}
+                {onView && (
+                  <button
+                    onClick={() => {
+                      onView(document);
+                      setShowActions(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View Chunks
+                  </button>
+                )}
+                {onDownload && (
+                  <button
+                    onClick={() => {
+                      onDownload(document);
+                      setShowActions(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={() => {
+                      onDelete(document);
+                      setShowActions(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Metadata */}
+        <div className="space-y-2 mb-4">
+          {document.project && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Folder className="w-4 h-4" />
+              <span>{document.project}</span>
+            </div>
+          )}
+          
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <User className="w-4 h-4" />
+              <span className="truncate">{document.uploadedByName || 'Unknown'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              <span>{formatDate(document.uploadedAt || document.createdAt)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Snippet */}
+        <div className="text-sm text-gray-700 leading-relaxed">
+          {highlightTextInContent(truncateText(document.content || document.snippet), highlightText)}
+        </div>
+
+        {/* Tags */}
+        {document.tags && document.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-3">
+            {document.tags.slice(0, 3).map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
+              >
+                <Tag className="w-3 h-3" />
+                {tag}
+              </span>
+            ))}
+            {document.tags.length > 3 && (
+              <span className="text-xs text-gray-500">+{document.tags.length - 3} more</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Footer Actions */}
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2">
+        {(onPreview || onView) && (
+          <button
+            onClick={() => onPreview ? onPreview(document) : onView(document)}
+            className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            {onPreview ? 'Preview' : 'View'}
+          </button>
+        )}
+        {onDownload && (
+          <button
+            onClick={() => onDownload(document)}
+            className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Download
+          </button>
+        )}
+        {onDelete && (
+          <button
+            onClick={() => onDelete(document)}
+            className="px-3 py-2 border border-red-300 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default DocumentCard;

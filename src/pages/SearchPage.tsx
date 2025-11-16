@@ -7,6 +7,8 @@ import { Modal } from '../components/Modal';
 import { useDebounce } from '../hooks/useDebounce';
 import { useToast } from '../components/Toast';
 import { validateSearch } from '../utils/validation';
+import UserInfoModal from '../components/UserInfoModal';
+import { userInfoExists } from '../utils/userInfo';
 
 interface SearchResult {
   id: string;
@@ -27,12 +29,20 @@ export function SearchPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
   const [error, setError] = useState('');
   const debouncedQuery = useDebounce(query, 300);
   const { addToast } = useToast();
 
   useEffect(() => {
     loadProjects();
+  }, []);
+
+  useEffect(() => {
+    // Check if user info is present, show modal if not
+    if (!userInfoExists()) {
+      setShowUserInfoModal(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -88,6 +98,11 @@ export function SearchPage() {
   const handleDownload = (filename: string) => {
     addToast(`Download link for ${filename} opened`, 'info');
   };
+
+  // Block UI until user info is provided
+  if (!userInfoExists()) {
+    return <UserInfoModal />;
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -233,6 +248,13 @@ export function SearchPage() {
           </div>
         )}
       </Modal>
+
+      {showUserInfoModal && (
+        <UserInfoModal
+          onClose={() => setShowUserInfoModal(false)}
+          onSubmit={() => setShowUserInfoModal(false)}
+        />
+      )}
     </div>
   );
 }
