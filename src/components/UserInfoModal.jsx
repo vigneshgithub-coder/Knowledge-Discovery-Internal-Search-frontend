@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, User, Mail, Phone } from 'lucide-react';
+import { apiClient } from '../services/api';
 import { userStorage } from '../utils/userStorage';
 
 const UserInfoModal = () => {
@@ -33,19 +34,12 @@ const UserInfoModal = () => {
     setIsSubmitting(true);
 
     try {
-      // Send to backend
-      const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:5000';
-      const response = await fetch(`${baseUrl}/users/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Send to backend using apiClient
+      console.log('API_BASE_URL:', apiClient.defaults.baseURL);
+      const response = await apiClient.post('/users/register', formData);
+      const result = response.data;
 
-      const result = await response.json();
-
-      if (response.ok && result.user) {
+      if (response.status === 200 && result.user) {
         // Save to localStorage with user ID
         const userInfoWithId = {
           ...formData,
@@ -58,7 +52,7 @@ const UserInfoModal = () => {
         // Reload page to hide modal and allow access
         window.location.reload();
       } else {
-        setError(result.message || 'Registration failed. Please try again.');
+        setError(result.error?.message || result.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('Registration error:', error);

@@ -4,6 +4,8 @@ import { userStorage } from '../utils/userStorage';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:5000/api').replace(/\/$/, '');
 
+console.log('API_BASE_URL initialized to:', API_BASE_URL);
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
