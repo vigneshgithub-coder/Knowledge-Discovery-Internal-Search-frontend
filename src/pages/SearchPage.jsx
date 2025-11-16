@@ -6,6 +6,7 @@ import { Modal } from '../components/ui/modal';
 import { useToast } from '../hooks/use-toast';
 import { searchDocuments } from '../services/api';
 import { getProjects } from '../services/api';
+import { deleteDocument } from '../services/api';
 import { userStorage } from '../utils/userStorage';
 import { validateSearch } from '../utils/validation';
 import { useDebounce } from '../hooks/use-debounce';
@@ -153,6 +154,22 @@ export function SearchPage() {
   const handleDownload = (document) => {
     if (document.fileUrl) {
       window.open(document.fileUrl, '_blank');
+    }
+  };
+
+  const handleDelete = async (document) => {
+    if (!confirm(`Are you sure you want to delete "${document.fileName}"?`)) {
+      return;
+    }
+
+    try {
+      await deleteDocument(document._id || document.id);
+      // Refresh search results
+      performSearch(currentPage);
+      addToast('Document deleted successfully', 'success');
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+      addToast('Failed to delete document', 'error');
     }
   };
 
@@ -375,6 +392,7 @@ export function SearchPage() {
                 document={document}
                 onPreview={handlePreview}
                 onDownload={handleDownload}
+                onDelete={handleDelete}
                 highlightText={query}
               />
             ))}
